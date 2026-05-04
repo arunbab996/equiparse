@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { FileText, Table2, ArrowRight, Play, Sparkles } from 'lucide-react'
 import UploadZone from './components/UploadZone'
 import ParseButton from './components/ParseButton'
 import DataCard from './components/DataCard'
@@ -13,8 +14,8 @@ import { parseGrantLetter } from './utils/openaiParse'
 import './App.css'
 
 const NAV_ITEMS = [
-  { id: 'grant',    label: 'Grant Parser',       icon: '📄' },
-  { id: 'captable', label: 'Cap Table Validator', icon: '📊' },
+  { id: 'grant',    label: 'Grant Parser',       Icon: FileText },
+  { id: 'captable', label: 'Cap Table Validator', Icon: Table2  },
 ]
 
 const DEMO_DATA = {
@@ -128,22 +129,25 @@ export default function App() {
 
         <nav className="sidebar-nav">
           <div className="sidebar-section-label">Tools</div>
-          {NAV_ITEMS.map(item => (
+          {NAV_ITEMS.map(({ id, label, Icon }) => (
             <button
-              key={item.id}
-              className={`sidebar-item ${activeNav === item.id ? 'sidebar-item--active' : ''}`}
-              onClick={() => setActiveNav(item.id)}
+              key={id}
+              className={`sidebar-item ${activeNav === id ? 'sidebar-item--active' : ''}`}
+              onClick={() => setActiveNav(id)}
             >
-              <span className="sidebar-item-icon">{item.icon}</span>
-              {item.label}
+              <Icon size={15} className="sidebar-item-icon" strokeWidth={activeNav === id ? 2.2 : 1.8} />
+              {label}
             </button>
           ))}
         </nav>
 
         <div className="sidebar-footer">
-          <span className="sidebar-footer-badge">🇮🇳 India · Beta</span>
+          <div className="sidebar-footer-badges">
+            <span className="sidebar-footer-tag">India</span>
+            <span className="sidebar-footer-tag sidebar-footer-tag--purple">Beta</span>
+          </div>
           <p className="sidebar-footer-note">SEBI SBEB 2021 · Companies Act 2013</p>
-          <p className="sidebar-footer-note">No data stored server-side</p>
+          <p className="sidebar-footer-note" style={{ marginTop: 4 }}>No data stored server-side</p>
         </div>
       </aside>
 
@@ -181,43 +185,49 @@ export default function App() {
 
               {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
-              <div className="workflow">
+              <div className="wf-panel">
                 {/* Step 1 */}
-                <div className={`workflow-step ${!file ? 'workflow-step--active' : ''}`}>
-                  <div className="step-header">
-                    <div className="step-num">1</div>
-                    <div className="step-meta">
-                      <div className="step-title">Upload Grant Letter</div>
-                      <div className="step-subtitle">PDF format · Max 20 MB · ESOS / ESPS / SAR / RSU</div>
+                <div className="wf-step">
+                  <div className="wf-indicator">
+                    <div className={`wf-circle ${file ? 'wf-circle--done' : 'wf-circle--active'}`}>
+                      {file
+                        ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        : '1'}
                     </div>
-                    {file && (
-                      <span className="step-badge step-badge--ready">
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                          <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                        Ready
-                      </span>
-                    )}
+                    <div className="wf-line" />
                   </div>
-                  <div className="step-body">
+                  <div className="wf-content">
+                    <div className="wf-step-head">
+                      <span className="wf-step-title">Upload Grant Letter</span>
+                      <span className="wf-step-sub">PDF · ESOS / ESPS / SAR / RSU · Max 20 MB</span>
+                    </div>
                     <UploadZone onFile={handleFile} file={file} disabled={loading} />
                   </div>
                 </div>
 
                 {/* Step 2 */}
-                <div className={`workflow-step ${file && !result ? 'workflow-step--active' : ''}`}>
-                  <div className="step-header">
-                    <div className="step-num">2</div>
-                    <div className="step-meta">
-                      <div className="step-title">Extract &amp; Analyse</div>
-                      <div className="step-subtitle">GPT-4o extracts 19 structured fields from your document</div>
+                <div className="wf-step wf-step--last">
+                  <div className="wf-indicator">
+                    <div className={`wf-circle ${file && !result ? 'wf-circle--active' : result ? 'wf-circle--done' : ''}`}>
+                      {result
+                        ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        : '2'}
                     </div>
                   </div>
-                  <div className="step-body">
+                  <div className="wf-content wf-content--last">
+                    <div className="wf-step-head">
+                      <span className="wf-step-title">Extract &amp; Analyse</span>
+                      <span className="wf-step-sub">GPT-4o extracts 19 structured fields</span>
+                    </div>
                     <ParseButton onClick={handleParse} loading={loading} disabled={!file || loading} />
-                    {!file && <p className="parse-hint">Upload a document above to continue</p>}
-                    <button className="demo-btn" onClick={() => { setResult(DEMO_DATA); setActiveTab('data') }} type="button">
-                      No PDF? Try with sample Indian ESOP data →
+                    {!file && <p className="parse-hint">Upload a document first</p>}
+                    <button
+                      className="demo-pill-btn"
+                      onClick={() => { setResult(DEMO_DATA); setActiveTab('data') }}
+                      type="button"
+                    >
+                      <Play size={11} fill="currentColor" />
+                      Try sample Indian ESOP data
                     </button>
                   </div>
                 </div>

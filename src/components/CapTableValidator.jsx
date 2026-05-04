@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import {
-  Upload, FileSpreadsheet, X, Sparkles, Loader2,
+  Upload, FileSpreadsheet, X, Sparkles, Loader2, Play, ArrowRight,
   AlertCircle, AlertTriangle, Info, CheckCircle2,
   Download, Users, Hash, Layers, CheckSquare, XSquare,
 } from 'lucide-react'
@@ -413,51 +413,53 @@ Arjun Kapoor,ABCPK1234F,Equity,100000,5.00%,15-Jan-2020,SC-006,arjun@techventure
         </div>
       )}
 
-      <div className="workflow">
-        {/* Upload */}
-        <div className={`workflow-step ${!file ? 'workflow-step--active' : ''}`}>
-          <div className="step-header">
-            <div className="step-num">1</div>
-            <div>
-              <div className="step-title">Upload Cap Table</div>
-              <div className="step-subtitle">CSV · XLSX · XLS · Max 10 MB</div>
+      <div className="wf-panel">
+        {/* Step 1 */}
+        <div className="wf-step">
+          <div className="wf-indicator">
+            <div className={`wf-circle ${file ? 'wf-circle--done' : 'wf-circle--active'}`}>
+              {file
+                ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                : '1'}
             </div>
-            {file && (
-              <span className="step-badge step-badge--ready">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Ready
-              </span>
-            )}
+            <div className="wf-line" />
           </div>
-          <div className="step-body">
+          <div className="wf-content">
+            <div className="wf-step-head">
+              <span className="wf-step-title">Upload Cap Table</span>
+              <span className="wf-step-sub">CSV · XLSX · XLS · Max 10 MB</span>
+            </div>
             <CapUploadZone file={file} onFile={handleFile} disabled={loading} />
           </div>
         </div>
 
-        {/* Analyse */}
-        <div className={`workflow-step ${file && !auditResult ? 'workflow-step--active' : ''}`}>
-          <div className="step-header">
-            <div className="step-num">2</div>
-            <div>
-              <div className="step-title">Audit with AI</div>
-              <div className="step-subtitle">GPT-4o checks for 12+ types of cap table errors</div>
+        {/* Step 2 */}
+        <div className="wf-step wf-step--last">
+          <div className="wf-indicator">
+            <div className={`wf-circle ${file && !auditResult ? 'wf-circle--active' : auditResult ? 'wf-circle--done' : ''}`}>
+              {auditResult
+                ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                : '2'}
             </div>
           </div>
-          <div className="step-body">
+          <div className="wf-content wf-content--last">
+            <div className="wf-step-head">
+              <span className="wf-step-title">Audit with AI</span>
+              <span className="wf-step-sub">GPT-4o · 12+ error types checked</span>
+            </div>
             <button
               className={`parse-btn ${loading ? 'parse-btn--loading' : ''}`}
               onClick={handleAnalyse}
               disabled={!file || loading}
             >
               {loading
-                ? <><Loader2 size={16} className="spin" /> Analysing cap table…</>
+                ? <><Loader2 size={16} className="spin" /> Analysing…</>
                 : <><Sparkles size={16} /> Audit with AI</>}
             </button>
-            {!file && <p className="parse-hint">Upload a file above to continue</p>}
-            <button className="demo-btn" onClick={loadDemo} disabled={loading} type="button">
-              No file? Try with sample cap table data →
+            {!file && <p className="parse-hint">Upload a file first</p>}
+            <button className="demo-pill-btn" onClick={loadDemo} disabled={loading} type="button">
+              <Play size={11} fill="currentColor" />
+              Try sample cap table data
             </button>
           </div>
         </div>

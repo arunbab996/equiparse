@@ -20,6 +20,8 @@
   left: 0;
   height: 100vh;
   z-index: 50;
+  /* subtle gradient at top */
+  background: linear-gradient(180deg, #fdfcff 0%, #fff 60px);
 }
 
 .sidebar-brand {
@@ -28,6 +30,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  border-top: 3px solid #6B62C9;
 }
 
 .brand-mark {
@@ -80,7 +83,7 @@
   width: 100%;
   padding: 9px 10px;
   border-radius: 7px;
-  font-size: 13.5px;
+  font-size: 13px;
   font-weight: 500;
   color: #4B5563;
   background: none;
@@ -90,6 +93,9 @@
   transition: background 0.13s, color 0.13s;
   font-family: var(--font-sans);
   letter-spacing: -0.1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-item:hover {
@@ -104,11 +110,8 @@
 }
 
 .sidebar-item-icon {
-  font-size: 15px;
-  width: 20px;
-  text-align: center;
   flex-shrink: 0;
-  line-height: 1;
+  width: 16px;
 }
 
 .sidebar-footer {
@@ -116,23 +119,32 @@
   border-top: 1px solid #E5E7EB;
 }
 
-.sidebar-footer-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
+.sidebar-footer-badges {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.sidebar-footer-tag {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
   background: #F3F4F6;
-  border-radius: 20px;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: #4B5563;
-  margin-bottom: 8px;
+  color: #6B7280;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.sidebar-footer-tag--purple {
+  background: #EDEAFC;
+  color: #5148B2;
 }
 
 .sidebar-footer-note {
   font-size: 11px;
   color: #9CA3AF;
-  line-height: 1.8;
+  line-height: 1.7;
   margin: 0;
 }
 
@@ -264,76 +276,99 @@
 .results-panel { margin-top: 16px; }
 
 /* ═══════════════════════════════════════════════════
-   WORKFLOW STEPS
+   STEPPER / WORKFLOW PANEL
 ═══════════════════════════════════════════════════ */
-.workflow {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
 
-.workflow-step {
+/* unified stepper card */
+.wf-panel {
   background: #fff;
   border: 1px solid #E5E7EB;
   border-radius: 12px;
-  overflow: hidden;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  padding: 20px 20px 20px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.workflow-step--active {
-  border-color: #C4BFF0;
-  box-shadow: 0 0 0 4px rgba(107,98,201,0.07);
-}
-
-.step-header {
+.wf-step {
   display: flex;
+  gap: 16px;
+}
+
+.wf-indicator {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 16px 22px;
-  border-bottom: 1px solid #F3F4F6;
-  background: #FAFAFA;
+  flex-shrink: 0;
 }
 
-.workflow-step--active .step-header {
-  background: #F5F3FF;
-  border-bottom-color: #EDE9FC;
-}
-
-.step-num {
-  width: 26px;
-  height: 26px;
+.wf-circle {
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #E9E7FA;
-  color: #6B62C9;
+  background: #F3F4F6;
+  color: #9CA3AF;
   font-size: 12px;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 2px solid #E5E7EB;
+  transition: background .2s, border-color .2s, color .2s;
 }
 
-.workflow-step--active .step-num {
+.wf-circle--active {
   background: #6B62C9;
+  border-color: #6B62C9;
+  color: #fff;
+  box-shadow: 0 0 0 4px rgba(107,98,201,0.12);
+}
+
+.wf-circle--done {
+  background: #10B981;
+  border-color: #10B981;
   color: #fff;
 }
 
-.step-meta { flex: 1; }
+.wf-line {
+  width: 2px;
+  flex: 1;
+  min-height: 16px;
+  background: linear-gradient(to bottom, #E5E7EB 60%, transparent);
+  margin: 6px 0;
+}
 
-.step-title {
-  font-size: 13.5px;
-  font-weight: 600;
+.wf-content {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 20px;
+}
+
+.wf-content--last { padding-bottom: 0; }
+
+.wf-step-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 14px;
+}
+
+.wf-step-title {
+  font-size: 14px;
+  font-weight: 700;
   color: #111827;
+  letter-spacing: -0.2px;
 }
 
-.step-subtitle {
-  font-size: 12.5px;
+.wf-step-sub {
+  font-size: 12px;
   color: #9CA3AF;
-  margin-top: 2px;
 }
 
+/* ── keep legacy .workflow for any remnants ── */
+.workflow { display: flex; flex-direction: column; gap: 12px; }
+
+/* step-badge kept for any legacy use */
 .step-badge {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -348,8 +383,6 @@
   background: var(--color-success-bg);
   border: 1px solid var(--color-success-border);
 }
-
-.step-body { padding: 20px 22px; }
 
 /* ═══════════════════════════════════════════════════
    SHARED PANEL BASE
@@ -751,6 +784,29 @@
   text-decoration-color: var(--el-purple-600);
 }
 
+.demo-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6B7280;
+  cursor: pointer;
+  transition: all .15s;
+  font-family: var(--font-sans);
+}
+
+.demo-pill-btn:hover {
+  border-color: var(--el-purple-300);
+  color: var(--el-purple-700);
+  background: var(--el-purple-50);
+}
+
 /* ═══════════════════════════════════════════════════
    UPLOAD ZONE
 ═══════════════════════════════════════════════════ */
@@ -758,7 +814,7 @@
   background: #FAFAFA;
   border: 1.5px dashed #D1D5DB;
   border-radius: 10px;
-  padding: 40px 24px;
+  padding: 28px 20px;
   text-align: center;
   cursor: pointer;
   transition: border-color .15s, background .15s, box-shadow .15s;
@@ -1547,12 +1603,12 @@
 ═══════════════════════════════════════════════════ */
 @media (max-width: 768px) {
   .sidebar { width: 64px; min-width: 64px; }
-  .sidebar-brand-text, .sidebar-section-label, .sidebar-footer-badge, .sidebar-footer-note { display: none; }
-  .sidebar-item { justify-content: center; padding: 10px; }
-  .sidebar-item-icon { width: auto; font-size: 18px; }
-  .sidebar-item span:not(.sidebar-item-icon) { display: none; }
+  .sidebar-brand-text, .sidebar-section-label, .sidebar-footer-badges, .sidebar-footer-note { display: none; }
+  .sidebar-item { justify-content: center; padding: 10px; gap: 0; }
   .app-main { margin-left: 64px; }
   .app-content { padding: 20px 16px 40px; }
+  .workflow { grid-template-columns: 1fr; }
+  .workflow-connector { display: none; }
   .tax-layout { grid-template-columns: 1fr; }
   .vesting-table-head, .vesting-table-row { grid-template-columns: 1fr 1fr 1fr; }
   .field-grid { grid-template-columns: 1fr; }
