@@ -7,9 +7,15 @@ import ErrorBanner from './components/ErrorBanner'
 import CompliancePanel from './components/CompliancePanel'
 import VestingTimeline from './components/VestingTimeline'
 import TaxEstimator from './components/TaxEstimator'
+import CapTableValidator from './components/CapTableValidator'
 import { extractTextFromPDF } from './utils/pdfExtract'
 import { parseGrantLetter } from './utils/openaiParse'
 import './App.css'
+
+const TOP_TABS = [
+  { id: 'grant',    label: 'Grant Parser',        icon: '📄' },
+  { id: 'captable', label: 'Cap Table Validator',  icon: '📊' },
+]
 
 const DEMO_DATA = {
   employeeName: 'Priya Sharma',
@@ -35,6 +41,7 @@ const DEMO_DATA = {
 }
 
 export default function App() {
+  const [topTab, setTopTab] = useState('grant')
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [loadStep, setLoadStep] = useState(0)
@@ -132,11 +139,29 @@ export default function App() {
             <span className="header-pill">India · Beta</span>
           </div>
         </div>
+        {/* Top-level tool switcher */}
+        <div className="top-nav">
+          <div className="top-nav-inner">
+            {TOP_TABS.map(t => (
+              <button
+                key={t.id}
+                className={`top-nav-tab ${topTab === t.id ? 'top-nav-tab--active' : ''}`}
+                onClick={() => setTopTab(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </header>
 
       <div className="app-body">
         <div className="container">
 
+          {topTab === 'captable' ? (
+            <CapTableValidator />
+          ) : (
+          <>
           <div className="page-hero">
             <h1 className="page-hero-title">ESOP Grant Letter Parser</h1>
             <p className="page-hero-sub">
@@ -223,6 +248,8 @@ export default function App() {
                 {activeTab === 'tax'        && <TaxEstimator data={result} />}
               </div>
             </div>
+          )}
+          </>
           )}
 
         </div>
