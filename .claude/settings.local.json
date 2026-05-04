@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "WebFetch(domain:www.equitylist.co)",
+      "WebFetch(domain:uploads-ssl.webflow.com)",
+      "WebFetch(domain:cdn.prod.website-files.com)",
+      "WebSearch",
+      "WebFetch(domain:wellfound.com)",
+      "Bash(gh auth *)",
+      "Bash(git -C /Users/arunbaburaj/equitylistprototype log --oneline)",
+      "Read(//Users/arunbaburaj/**)",
+      "Read(//Users/arunbaburaj/.config/gh/**)",
+      "Bash(git config *)",
+      "Bash(defaults read *)",
+      "Bash(git init *)",
+      "Bash(git add *)"
+    ]
+  }
+}
