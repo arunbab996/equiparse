@@ -1,4 +1,8 @@
-const SYSTEM_PROMPT = `You are an expert at auditing Indian startup cap tables. Analyse the table data provided and return ONLY a valid JSON object with this structure:
+const SYSTEM_PROMPT = `You are an expert at auditing Indian startup cap tables.
+
+The CSV you receive includes a "Row_Number" column. This is the authoritative row number for each entry (row 1 = header row, data rows start at 2). ALWAYS use the value from the "Row_Number" column when reporting row numbers — never count rows yourself.
+
+Return ONLY a valid JSON object with this exact structure:
 {
   "errors": [{"row": number|null, "field": string, "issue": string}],
   "warnings": [{"row": number|null, "field": string, "issue": string}],
@@ -12,23 +16,37 @@ const SYSTEM_PROMPT = `You are an expert at auditing Indian startup cap tables. 
   }
 }
 
-Check for:
-- Rows with missing shareholder names or PAN numbers
-- Duplicate shareholder entries (same name or PAN appearing more than once)
-- Share totals that don't add up correctly across all rows
-- Missing or inconsistent share classes (e.g. "Equity", "Preference", "CCPS", "ESOP")
-- Invalid, missing, or inconsistently formatted dates
-- Negative or zero share counts
-- Invalid PAN format (Indian PAN is 10 characters: AAAAA9999A pattern)
-- Missing or suspicious data in any column (e.g. blank cells in key fields)
-- Any fields that look incomplete, ambiguous, or use inconsistent formatting
+Rules for checking:
 
-For Indian cap tables specifically also check:
-- Whether share certificate numbers follow a sequence
-- Whether the total of all share classes matches the authorised/issued capital if stated
-- ESOP pool percentage vs total shares
+ERRORS (blocking issues):
+- Missing shareholder name (empty or blank)
+- Missing or invalid PAN number — EXCEPT skip PAN checks for entries that are clearly an ESOP/option pool (e.g. name contains "ESOP", "Option Pool", "EOP", "Stock Option") since pools are not legal entities and do not have PANs
+- Invalid PAN format: must be exactly 10 characters matching AAAAA9999A (first 3 = any letters, 4th = entity type letter [P/C/H/F/A/B/G/J/L/T/K/E], 5th = any letter, next 4 = digits, last = any letter)
+- Duplicate shareholder name (same name appears in more than one row)
+- Duplicate PAN (same PAN appears in more than one row — ignore blank PANs)
+- Negative or zero share count
+- Share counts that appear mathematically inconsistent with stated percentages (off by more than 1%)
 
-Return row numbers as they appear in the data (starting from row 2 where row 1 is the header). Use null for row if the issue is table-wide. Do not include any explanation or markdown outside the JSON.`
+WARNINGS (issues to review):
+- Missing email address for individual shareholders
+- Missing investment date for individual shareholders (pools and founders may not have investment dates)
+- Share certificate numbers that do not follow an obvious sequence
+- Inconsistent date formatting across rows
+- Percentage values that don't sum to exactly 100% (flag as warning, not error, since rounding is common)
+
+INFO (observations):
+- Note the ESOP pool size as a % of total shares
+- Note if fully diluted share count differs from issued shares
+- Note any share classes that are unusual for Indian startups
+
+For the summary:
+- total_shareholders: count ALL rows including duplicates (report actual row count, not unique names)
+- total_shares: sum of all share counts
+- share_classes: unique list of share class values found
+- is_math_correct: true only if all rows' % holding × total_shares ≈ that row's share count (within 1%), AND sum of all holdings ≈ 100%
+- fully_diluted_shares: include ESOP pool in count if present, otherwise null
+
+Use null for "row" if the issue is table-wide. Do not include any explanation or markdown outside the JSON.`
 
 export async function auditCapTable(csvText) {
   const apiKey = import.meta.env.VITE_OPENAI_API_KEY
@@ -50,7 +68,7 @@ export async function auditCapTable(csvText) {
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `Audit the following Indian startup cap table and return structured JSON:\n\n${csvText}`,
+          content: `Audit the following Indian startup cap table. Use the Row_Number column for all row references in your response.\n\n${csvText}`,
         },
       ],
     }),

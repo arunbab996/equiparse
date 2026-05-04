@@ -397,11 +397,11 @@ Arjun Kapoor,ABCPK1234F,Equity,100000,5.00%,15-Jan-2020,SC-006,arjun@techventure
 
   return (
     <div className="ct-root">
-      <div className="page-hero">
-        <h1 className="page-hero-title">Cap Table Validator</h1>
-        <p className="page-hero-sub">
-          Upload a cap table CSV or Excel file. GPT-4o audits it for errors, missing data,
-          duplicate entries, math discrepancies, and Indian regulatory fields — then generates a downloadable PDF report.
+      <div className="page-header">
+        <h1 className="page-title">Cap Table Validator</h1>
+        <p className="page-subtitle">
+          Upload a CSV or Excel cap table. GPT-4o audits for missing PANs, duplicates, math errors,
+          invalid share classes, and Indian regulatory fields — then generates a PDF report.
         </p>
       </div>
 
