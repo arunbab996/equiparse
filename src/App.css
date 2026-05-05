@@ -236,6 +236,7 @@
 /* Centred upload flow — max-width so the stepper doesn't stretch absurdly wide */
 .upload-flow {
   max-width: 680px;
+  margin: 0 auto;
 }
 
 /* ── Page header ────────────────────────────────── */

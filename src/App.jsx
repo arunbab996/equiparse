@@ -130,7 +130,7 @@ export default function App() {
       {/* ── Sidebar ─────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <a href="https://equitylist.co" target="_blank" rel="noopener noreferrer" className="brand-logo-link">
+          <a href="https://equiparse.vercel.app/" target="_blank" rel="noopener noreferrer" className="brand-logo-link">
             <img src="/equitylist-brand.png" alt="EquityList" className="brand-logo-img" />
           </a>
         </div>
