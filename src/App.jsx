@@ -1,5 +1,9 @@
 import { useState, useCallback } from 'react'
-import { FileText, Table2, ArrowRight, Play, Sparkles } from 'lucide-react'
+import {
+  FileText, Play, RotateCcw, Copy, Download,
+  Lock, LayoutGrid, ClipboardList, TrendingUp,
+  BookOpen, Users, ChevronRight,
+} from 'lucide-react'
 import UploadZone from './components/UploadZone'
 import ParseButton from './components/ParseButton'
 import DataCard from './components/DataCard'
@@ -8,14 +12,21 @@ import ErrorBanner from './components/ErrorBanner'
 import CompliancePanel from './components/CompliancePanel'
 import VestingTimeline from './components/VestingTimeline'
 import TaxEstimator from './components/TaxEstimator'
-import CapTableValidator from './components/CapTableValidator'
 import { extractTextFromPDF } from './utils/pdfExtract'
 import { parseGrantLetter } from './utils/openaiParse'
 import './App.css'
 
-const NAV_ITEMS = [
-  { id: 'grant',    label: 'Grant Parser',       Icon: FileText },
-  { id: 'captable', label: 'Cap Table Validator', Icon: Table2  },
+/* ── Sidebar config ──────────────────────────────── */
+const ACTIVE_TOOLS = [
+  { id: 'grant', label: 'Grant Parser', Icon: FileText },
+]
+
+const LOCKED_TOOLS = [
+  { label: 'Cap Table Manager',   Icon: LayoutGrid   },
+  { label: 'Compliance Tracker',  Icon: ClipboardList },
+  { label: 'Valuation Engine',    Icon: TrendingUp   },
+  { label: 'Board Reports',       Icon: BookOpen     },
+  { label: 'Employee ESOP Portal',Icon: Users        },
 ]
 
 const DEMO_DATA = {
@@ -49,17 +60,20 @@ const GRANT_TABS = [
 ]
 
 export default function App() {
-  const [activeNav, setActiveNav] = useState('grant')
-  const [file, setFile]           = useState(null)
-  const [loading, setLoading]     = useState(false)
-  const [loadStep, setLoadStep]   = useState(0)
-  const [result, setResult]       = useState(null)
-  const [error, setError]         = useState(null)
-  const [copied, setCopied]       = useState(false)
+  const [file, setFile]       = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [loadStep, setLoadStep] = useState(0)
+  const [result, setResult]   = useState(null)
+  const [error, setError]     = useState(null)
+  const [copied, setCopied]   = useState(false)
   const [activeTab, setActiveTab] = useState('data')
 
   const handleFile = (f) => {
     setFile(f); setResult(null); setError(null); setActiveTab('data')
+  }
+
+  const handleReset = () => {
+    setFile(null); setResult(null); setError(null); setActiveTab('data')
   }
 
   const handleParse = async () => {
@@ -104,11 +118,11 @@ export default function App() {
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url; a.download = `equiparse-${Date.now()}.csv`; a.click()
+    a.href = url; a.download = `grant-${Date.now()}.csv`; a.click()
     URL.revokeObjectURL(url)
   }
 
-  const currentLabel = NAV_ITEMS.find(n => n.id === activeNav)?.label
+  const showResults = result && !loading
 
   return (
     <div className="app-shell">
@@ -117,20 +131,29 @@ export default function App() {
       <aside className="sidebar">
         <div className="sidebar-brand">
           <img src="/equitylist-brand.png" alt="EquityList" className="brand-logo-img" />
-          <span className="sidebar-product">EquiParse</span>
         </div>
 
         <nav className="sidebar-nav">
+          {/* Active tools */}
           <div className="sidebar-section-label">Tools</div>
-          {NAV_ITEMS.map(({ id, label, Icon }) => (
+          {ACTIVE_TOOLS.map(({ id, label, Icon }) => (
             <button
               key={id}
-              className={`sidebar-item ${activeNav === id ? 'sidebar-item--active' : ''}`}
-              onClick={() => setActiveNav(id)}
+              className="sidebar-item sidebar-item--active"
             >
-              <Icon size={15} className="sidebar-item-icon" strokeWidth={activeNav === id ? 2.2 : 1.8} />
+              <Icon size={15} className="sidebar-item-icon" strokeWidth={2.2} />
               {label}
             </button>
+          ))}
+
+          {/* Locked platform tools */}
+          <div className="sidebar-section-label" style={{ marginTop: 20 }}>Platform</div>
+          {LOCKED_TOOLS.map(({ label, Icon }) => (
+            <div key={label} className="sidebar-item sidebar-item--locked" title="Coming soon">
+              <Icon size={15} className="sidebar-item-icon" strokeWidth={1.6} />
+              <span className="sidebar-item-locked-label">{label}</span>
+              <Lock size={11} className="sidebar-lock-icon" />
+            </div>
           ))}
         </nav>
 
@@ -150,9 +173,9 @@ export default function App() {
         {/* Top bar */}
         <header className="topbar">
           <div className="topbar-breadcrumb">
-            <span className="topbar-home">EquiParse</span>
+            <span className="topbar-home">EquityList</span>
             <span className="topbar-sep">›</span>
-            <span className="topbar-current">{currentLabel}</span>
+            <span className="topbar-current">Grant Parser</span>
           </div>
           <div className="topbar-right">
             <span className="topbar-version">Prototype v0.2</span>
@@ -162,11 +185,10 @@ export default function App() {
         {/* Content */}
         <main className="app-content">
 
-          {activeNav === 'captable' ? (
-            <CapTableValidator />
-          ) : (
+          {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
-            /* ── Grant Parser ─────────────────────── */
+          {/* ── Stepper: only shown before results ── */}
+          {!showResults && (
             <>
               <div className="page-header">
                 <h1 className="page-title">ESOP Grant Letter Parser</h1>
@@ -175,8 +197,6 @@ export default function App() {
                   compliance, visualise vesting, and estimate Indian tax impact.
                 </p>
               </div>
-
-              {error && <ErrorBanner message={error} onDismiss={() => setError(null)} />}
 
               <div className="wf-panel">
                 {/* Step 1 */}
@@ -201,11 +221,7 @@ export default function App() {
                 {/* Step 2 */}
                 <div className="wf-step wf-step--last">
                   <div className="wf-indicator">
-                    <div className={`wf-circle ${file && !result ? 'wf-circle--active' : result ? 'wf-circle--done' : ''}`}>
-                      {result
-                        ? <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                        : '2'}
-                    </div>
+                    <div className={`wf-circle ${file && !result ? 'wf-circle--active' : ''}`}>2</div>
                   </div>
                   <div className="wf-content wf-content--last">
                     <div className="wf-step-head">
@@ -231,29 +247,45 @@ export default function App() {
                   <LoadingPanel step={loadStep} />
                 </div>
               )}
-
-              {result && !loading && (
-                <div className="results-section">
-                  <div className="results-tabs">
-                    {GRANT_TABS.map(tab => (
-                      <button
-                        key={tab.id}
-                        className={`results-tab ${activeTab === tab.id ? 'results-tab--active' : ''}`}
-                        onClick={() => setActiveTab(tab.id)}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="results-panel">
-                    {activeTab === 'data'       && <DataCard data={result} onUpdate={handleUpdate} onCopyJSON={handleCopyJSON} onExportCSV={handleExportCSV} />}
-                    {activeTab === 'compliance' && <CompliancePanel data={result} />}
-                    {activeTab === 'vesting'    && <VestingTimeline data={result} />}
-                    {activeTab === 'tax'        && <TaxEstimator data={result} />}
-                  </div>
-                </div>
-              )}
             </>
+          )}
+
+          {/* ── Results ─────────────────────────────── */}
+          {showResults && (
+            <div className="results-section results-section--full">
+              {/* Tab bar + action buttons in one row */}
+              <div className="results-topbar">
+                <div className="results-tabs">
+                  {GRANT_TABS.map(tab => (
+                    <button
+                      key={tab.id}
+                      className={`results-tab ${activeTab === tab.id ? 'results-tab--active' : ''}`}
+                      onClick={() => setActiveTab(tab.id)}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="results-actions">
+                  <button className="action-btn action-btn--secondary" onClick={handleCopyJSON}>
+                    <Copy size={13} /> Copy JSON
+                  </button>
+                  <button className="action-btn action-btn--secondary" onClick={handleExportCSV}>
+                    <Download size={13} /> Export CSV
+                  </button>
+                  <button className="action-btn action-btn--ghost" onClick={handleReset} title="Parse another grant">
+                    <RotateCcw size={13} /> Parse another
+                  </button>
+                </div>
+              </div>
+
+              <div className="results-panel">
+                {activeTab === 'data'       && <DataCard data={result} onUpdate={handleUpdate} onCopyJSON={handleCopyJSON} onExportCSV={handleExportCSV} />}
+                {activeTab === 'compliance' && <CompliancePanel data={result} />}
+                {activeTab === 'vesting'    && <VestingTimeline data={result} />}
+                {activeTab === 'tax'        && <TaxEstimator data={result} />}
+              </div>
+            </div>
           )}
 
         </main>

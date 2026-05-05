@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { AlertTriangle, CheckCircle2, Edit3, Check, X, Copy, Download } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Edit3, Check, X } from 'lucide-react'
 
 const FIELD_META = [
   { key: 'employeeName',       label: 'Employee Name',            group: 'Identity' },
@@ -121,12 +121,6 @@ export default function DataCard({ data, onUpdate, onCopyJSON, onExportCSV }) {
 
       <div className="data-card-footer">
         <span className="footer-hint">All edits are local — nothing is saved to a server</span>
-        <button className="action-btn action-btn--secondary" onClick={onCopyJSON}>
-          <Copy size={14} /> Copy as JSON
-        </button>
-        <button className="action-btn action-btn--primary" onClick={onExportCSV}>
-          <Download size={14} /> Export CSV
-        </button>
       </div>
     </div>
   )
