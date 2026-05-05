@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import {
   FileText, Play, RotateCcw, Copy, Download,
   Lock, LayoutGrid, ClipboardList, TrendingUp,
-  BookOpen, Users, ChevronRight,
+  BookOpen, Users, Sparkles, ShieldCheck, Calculator,
 } from 'lucide-react'
 import UploadZone from './components/UploadZone'
 import ParseButton from './components/ParseButton'
@@ -191,12 +191,12 @@ export default function App() {
 
           {/* ── Stepper: only shown before results ── */}
           {!showResults && (
-            <>
+            <div className="upload-flow">
               <div className="page-header">
                 <h1 className="page-title">ESOP Grant Letter Parser</h1>
                 <p className="page-subtitle">
-                  Upload an ESOP / ESOS grant letter PDF to extract structured data, check SEBI &amp; Companies Act
-                  compliance, visualise vesting, and estimate Indian tax impact.
+                  Upload any ESOP / ESOS grant letter PDF — GPT-4o extracts 19 structured fields,
+                  checks SEBI &amp; Companies Act compliance, and estimates Indian tax impact.
                 </p>
               </div>
 
@@ -220,15 +220,15 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Step 2 */}
+                {/* Step 2 — only turns active once a file is chosen */}
                 <div className="wf-step wf-step--last">
                   <div className="wf-indicator">
-                    <div className={`wf-circle ${file && !result ? 'wf-circle--active' : ''}`}>2</div>
+                    <div className={`wf-circle ${file ? 'wf-circle--active' : ''}`}>2</div>
                   </div>
                   <div className="wf-content wf-content--last">
                     <div className="wf-step-head">
                       <span className="wf-step-title">Extract &amp; Analyse</span>
-                      <span className="wf-step-sub">GPT-4o extracts 19 structured fields</span>
+                      <span className="wf-step-sub">GPT-4o · 19 structured fields</span>
                     </div>
                     <ParseButton onClick={handleParse} loading={loading} disabled={!file || loading} />
                     {!file && <p className="parse-hint">Upload a document first</p>}
@@ -249,7 +249,34 @@ export default function App() {
                   <LoadingPanel step={loadStep} />
                 </div>
               )}
-            </>
+
+              {/* Feature strip — visible only when not loading */}
+              {!loading && (
+                <div className="feature-strip">
+                  <div className="feature-strip-item">
+                    <div className="feature-strip-icon"><Sparkles size={18} /></div>
+                    <div className="feature-strip-text">
+                      <span className="feature-strip-title">19 Fields, AI-Extracted</span>
+                      <span className="feature-strip-sub">Grant dates, exercise price, vesting schedule, expiry — all in one click</span>
+                    </div>
+                  </div>
+                  <div className="feature-strip-item">
+                    <div className="feature-strip-icon"><ShieldCheck size={18} /></div>
+                    <div className="feature-strip-text">
+                      <span className="feature-strip-title">Regulatory Compliance</span>
+                      <span className="feature-strip-sub">SEBI SBEB 2021 &amp; Companies Act 2013 checks, auto-flagged</span>
+                    </div>
+                  </div>
+                  <div className="feature-strip-item">
+                    <div className="feature-strip-icon"><Calculator size={18} /></div>
+                    <div className="feature-strip-text">
+                      <span className="feature-strip-title">Indian Tax Estimator</span>
+                      <span className="feature-strip-sub">Perquisite tax at exercise + LTCG / STCG at sale, regime-aware</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {/* ── Results ─────────────────────────────── */}

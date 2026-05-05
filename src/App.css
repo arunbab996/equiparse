@@ -233,6 +233,11 @@
   box-sizing: border-box;
 }
 
+/* Centred upload flow — max-width so the stepper doesn't stretch absurdly wide */
+.upload-flow {
+  max-width: 680px;
+}
+
 /* ── Page header ────────────────────────────────── */
 .page-header {
   margin-bottom: 24px;
@@ -768,6 +773,7 @@
 ═══════════════════════════════════════════════════ */
 .parse-btn {
   display: flex;
+  width: fit-content;
   align-items: center;
   gap: 8px;
   padding: 11px 22px;
@@ -858,9 +864,9 @@
 ═══════════════════════════════════════════════════ */
 .upload-zone {
   background: #FAFAFA;
-  border: 1.5px dashed #D1D5DB;
+  border: 1.5px dashed #B8BFC9;
   border-radius: 10px;
-  padding: 28px 20px;
+  padding: 20px;
   text-align: center;
   cursor: pointer;
   transition: border-color .15s, background .15s, box-shadow .15s;
@@ -889,9 +895,9 @@
 }
 
 .upload-icon-wrap {
-  width: 52px;
-  height: 52px;
-  border-radius: 10px;
+  width: 44px;
+  height: 44px;
+  border-radius: 9px;
   background: #fff;
   border: 1px solid #E5E7EB;
   display: flex;
@@ -1625,6 +1631,55 @@
 .ct-clean-icon { color: var(--color-success); }
 .ct-clean-title { font-size: 16px; font-weight: 700; color: #111827; }
 .ct-clean-sub { font-size: 13.5px; color: #9CA3AF; }
+
+/* ═══════════════════════════════════════════════════
+   FEATURE STRIP
+═══════════════════════════════════════════════════ */
+.feature-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.feature-strip-item {
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.feature-strip-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--el-purple-50);
+  border: 1px solid var(--el-purple-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--el-purple-600);
+  flex-shrink: 0;
+}
+
+.feature-strip-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.feature-strip-sub {
+  font-size: 12px;
+  color: #9CA3AF;
+  display: block;
+  line-height: 1.5;
+}
 
 /* ═══════════════════════════════════════════════════
    ANIMATIONS
