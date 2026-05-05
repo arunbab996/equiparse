@@ -25,32 +25,20 @@
 }
 
 .sidebar-brand {
-  padding: 18px 16px 16px;
+  padding: 14px 16px 12px;
   border-bottom: 1px solid #E5E7EB;
-  display: flex;
-  align-items: center;
-  gap: 10px;
   border-top: 3px solid #6B62C9;
-}
-
-.brand-mark {
-  width: 30px;
-  height: 30px;
-  flex-shrink: 0;
-}
-
-.sidebar-brand-text {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 5px;
 }
 
-.sidebar-wordmark {
-  font-size: 14px;
-  font-weight: 700;
-  color: #0F172A;
-  letter-spacing: -0.3px;
-  line-height: 1.2;
+.brand-logo-img {
+  height: 22px;
+  width: auto;
+  max-width: 160px;
+  display: block;
+  object-fit: contain;
 }
 
 .sidebar-product {
@@ -215,7 +203,8 @@
 .app-content {
   flex: 1;
   padding: 28px 32px 56px;
-  max-width: 940px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* ── Page header ────────────────────────────────── */

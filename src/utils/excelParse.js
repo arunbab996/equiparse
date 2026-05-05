@@ -23,7 +23,19 @@ export async function parseCapTable(file) {
     throw new Error('The file appears empty or has no data rows.')
   }
 
-  const [headerRow, ...dataRows] = aoa
+  // Smart header detection: scan first 15 rows and pick the one with the
+  // most non-empty cells. Complex Indian cap tables often have merged company-
+  // name / date rows above the real column headers, which have far fewer cells.
+  let headerIdx = 0
+  let maxNonEmpty = 0
+  const scanLimit = Math.min(15, aoa.length - 1)
+  for (let i = 0; i < scanLimit; i++) {
+    const count = aoa[i].filter(c => c !== '' && c != null && String(c).trim() !== '').length
+    if (count > maxNonEmpty) { maxNonEmpty = count; headerIdx = i }
+  }
+
+  const headerRow = aoa[headerIdx]
+  const dataRows  = aoa.slice(headerIdx + 1)
   const headers = headerRow.map(h => String(h).trim()).filter(Boolean)
 
   // Convert to objects, attaching a 1-based row number

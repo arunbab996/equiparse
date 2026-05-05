@@ -123,7 +123,7 @@ function SummaryCard({ summary }) {
       <div className="ct-summary-stat">
         <Users size={16} className="ct-summary-icon" />
         <div>
-          <div className="ct-summary-val">{Number(total_shareholders || 0).toLocaleString('en-IN')}</div>
+          <div className="ct-summary-val">{total_shareholders ? Number(total_shareholders).toLocaleString('en-IN') : '—'}</div>
           <div className="ct-summary-label">Shareholders</div>
         </div>
       </div>
@@ -131,7 +131,7 @@ function SummaryCard({ summary }) {
       <div className="ct-summary-stat">
         <Hash size={16} className="ct-summary-icon" />
         <div>
-          <div className="ct-summary-val">{Number(total_shares || 0).toLocaleString('en-IN')}</div>
+          <div className="ct-summary-val">{total_shares ? Number(total_shares).toLocaleString('en-IN') : '—'}</div>
           <div className="ct-summary-label">Total Shares</div>
         </div>
       </div>

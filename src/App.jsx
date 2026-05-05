@@ -116,15 +116,8 @@ export default function App() {
       {/* ── Sidebar ─────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <svg className="brand-mark" viewBox="0 0 32 32" fill="none">
-            <rect x="2" y="2" width="20" height="20" rx="5.5" fill="#6B62C9"/>
-            <rect x="11" y="11" width="14" height="14" rx="4" fill="#9B95DF"/>
-            <circle cx="9" cy="27" r="4" fill="#6B62C9"/>
-          </svg>
-          <div className="sidebar-brand-text">
-            <span className="sidebar-wordmark">EquityList</span>
-            <span className="sidebar-product">EquiParse</span>
-          </div>
+          <img src="/equitylist-brand.png" alt="EquityList" className="brand-logo-img" />
+          <span className="sidebar-product">EquiParse</span>
         </div>
 
         <nav className="sidebar-nav">
