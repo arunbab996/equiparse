@@ -32,6 +32,16 @@
   align-items: center;
 }
 
+.brand-logo-link {
+  display: inline-flex;
+  text-decoration: none;
+  outline: none;
+  border-radius: 4px;
+  transition: opacity .15s;
+}
+
+.brand-logo-link:hover { opacity: 0.8; }
+
 .brand-logo-img {
   height: 22px;
   width: auto;
@@ -757,7 +767,7 @@
    PARSE BUTTON
 ═══════════════════════════════════════════════════ */
 .parse-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   padding: 11px 22px;
@@ -824,7 +834,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 16px;
   padding: 6px 14px;
   background: #fff;
   border: 1.5px solid #E5E7EB;

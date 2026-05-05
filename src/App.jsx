@@ -130,7 +130,9 @@ export default function App() {
       {/* ── Sidebar ─────────────────────────────────── */}
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <img src="/equitylist-brand.png" alt="EquityList" className="brand-logo-img" />
+          <a href="https://equitylist.co" target="_blank" rel="noopener noreferrer" className="brand-logo-link">
+            <img src="/equitylist-brand.png" alt="EquityList" className="brand-logo-img" />
+          </a>
         </div>
 
         <nav className="sidebar-nav">
@@ -146,8 +148,8 @@ export default function App() {
             </button>
           ))}
 
-          {/* Locked platform tools */}
-          <div className="sidebar-section-label" style={{ marginTop: 20 }}>Platform</div>
+          {/* Locked internal tools */}
+          <div className="sidebar-section-label" style={{ marginTop: 20 }}>Internal Tools</div>
           {LOCKED_TOOLS.map(({ label, Icon }) => (
             <div key={label} className="sidebar-item sidebar-item--locked" title="Coming soon">
               <Icon size={15} className="sidebar-item-icon" strokeWidth={1.6} />
