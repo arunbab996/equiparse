@@ -1400,6 +1400,120 @@
 .tax-result-note { margin-top: 10px; font-size: 11.5px; color: #9CA3AF; font-style: italic; line-height: 1.5; }
 .tax-result-empty { font-size: 12.5px; color: #9CA3AF; padding: 8px 0; }
 
+/* DPIIT pill toggle */
+.dpiit-pill {
+  display: inline-flex;
+  border: 1.5px solid var(--el-purple-200);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dpiit-btn {
+  padding: 6px 18px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  background: #fff;
+  color: #6B7280;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  line-height: 1;
+}
+.dpiit-btn:first-child { border-right: 1.5px solid var(--el-purple-200); }
+.dpiit-btn--active { background: var(--el-purple-600); color: #fff; }
+.dpiit-btn:hover:not(.dpiit-btn--active) { background: var(--el-purple-50); color: var(--el-purple-700); }
+
+/* Tax slab select */
+.tax-select {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  cursor: pointer;
+  font-family: var(--font-mono);
+}
+
+/* Input divider */
+.tax-input-divider { height: 1px; background: #E5E7EB; margin: 2px 0; }
+
+/* DPIIT side-by-side cards */
+.dpiit-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 2px;
+}
+.dpiit-card {
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 12px;
+  background: #FAFAFA;
+}
+.dpiit-card--deferred {
+  background: #FFFBEB;
+  border-color: #FCD34D;
+}
+.dpiit-card-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: #9CA3AF;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 8px;
+}
+.dpiit-card-header--deferred { color: #D97706; }
+
+.dpiit-timing {
+  margin-top: 8px;
+  font-size: 11.5px;
+  font-style: italic;
+  line-height: 1.5;
+  color: #9CA3AF;
+}
+.dpiit-timing--deferred { color: #D97706; }
+
+.dpiit-due-date {
+  margin-top: 7px;
+  font-size: 12px;
+  color: #92400E;
+  background: #FEF3C7;
+  border: 1px solid #FCD34D;
+  border-radius: 5px;
+  padding: 5px 9px;
+  line-height: 1.4;
+}
+
+/* DPIIT summary callout */
+.dpiit-summary-box {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-left: 3px solid #F59E0B;
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: #92400E;
+  line-height: 1.6;
+}
+
+/* Capital gains static note */
+.tax-capgains-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 10px 13px;
+  background: #F0FDF4;
+  border: 1px solid #D1FAE5;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: #065F46;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .dpiit-cards { grid-template-columns: 1fr; }
+}
+
 /* ═══════════════════════════════════════════════════
    TOAST
 ═══════════════════════════════════════════════════ */

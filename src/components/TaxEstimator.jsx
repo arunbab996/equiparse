@@ -1,35 +1,11 @@
 import { useState } from 'react'
-import { Calculator, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
 
-const TAX_SLABS_NEW = [
-  { limit: 300000,  rate: 0,    label: 'Up to ₹3L' },
-  { limit: 700000,  rate: 0.05, label: '₹3L – ₹7L' },
-  { limit: 1000000, rate: 0.10, label: '₹7L – ₹10L' },
-  { limit: 1200000, rate: 0.15, label: '₹10L – ₹12L' },
-  { limit: 1500000, rate: 0.20, label: '₹12L – ₹15L' },
-  { limit: Infinity, rate: 0.30, label: 'Above ₹15L' },
+const SLAB_OPTIONS = [
+  { label: '5%',  value: '0.05' },
+  { label: '20%', value: '0.20' },
+  { label: '30%', value: '0.30' },
 ]
-
-function calcSlabTax(income) {
-  let tax = 0
-  let prev = 0
-  for (const slab of TAX_SLABS_NEW) {
-    if (income <= prev) break
-    const taxable = Math.min(income, slab.limit) - prev
-    tax += taxable * slab.rate
-    prev = slab.limit
-  }
-  return tax
-}
-
-function calcPerquisiteTax(fmvAtExercise, exercisePrice, options, otherIncome) {
-  const perquisite = Math.max(0, (fmvAtExercise - exercisePrice) * options)
-  const totalIncome = otherIncome + perquisite
-  const taxOnTotal = calcSlabTax(totalIncome)
-  const taxWithout  = calcSlabTax(otherIncome)
-  const taxOnPerquisite = taxOnTotal - taxWithout
-  return { perquisite, taxOnPerquisite, effectiveRate: perquisite > 0 ? taxOnPerquisite / perquisite : 0 }
-}
 
 function calcCapGains(saleFMV, exerciseFMV, options, holdingMonths) {
   const gain = Math.max(0, (saleFMV - exerciseFMV) * options)
@@ -44,24 +20,37 @@ function calcCapGains(saleFMV, exerciseFMV, options, holdingMonths) {
 function fmt(n) { return '₹' + Math.round(n).toLocaleString('en-IN') }
 function fmtPct(r) { return (r * 100).toFixed(1) + '%' }
 
+function addFiveYears(dateStr) {
+  if (!dateStr) return null
+  const d = new Date(dateStr)
+  if (isNaN(d.getTime())) return null
+  d.setFullYear(d.getFullYear() + 5)
+  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export default function TaxEstimator({ data }) {
-  const ep = Number(data.exercisePrice) || 0
+  const ep   = Number(data.exercisePrice)   || 0
   const opts = Number(data.numberOfOptions) || 0
 
-  const [fmvAtExercise, setFmvAtExercise]     = useState(ep ? String(ep * 3) : '')
-  const [fmvAtSale, setFmvAtSale]             = useState(ep ? String(ep * 5) : '')
-  const [otherIncome, setOtherIncome]         = useState('2000000')
-  const [holdingMonths, setHoldingMonths]     = useState('18')
-  const [optionsToExercise, setOptionsToExercise] = useState(String(opts))
+  const [fmvAtExercise,    setFmvAtExercise]    = useState(ep ? String(ep * 3) : '')
+  const [fmvAtSale,        setFmvAtSale]        = useState(ep ? String(ep * 5) : '')
+  const [holdingMonths,    setHoldingMonths]    = useState('18')
+  const [optionsToExercise,setOptionsToExercise]= useState(String(opts))
+  const [isDpiit,          setIsDpiit]          = useState(false)
+  const [taxSlab,          setTaxSlab]          = useState('0.30')
+  const [exerciseDate,     setExerciseDate]     = useState('')
 
-  const fmvEx  = Number(fmvAtExercise)  || 0
-  const fmvSale = Number(fmvAtSale)     || 0
-  const oInc   = Number(otherIncome)    || 0
-  const hMonths = Number(holdingMonths) || 0
-  const optsEx = Number(optionsToExercise) || 0
+  const fmvEx    = Number(fmvAtExercise)    || 0
+  const fmvSale  = Number(fmvAtSale)        || 0
+  const hMonths  = Number(holdingMonths)    || 0
+  const optsEx   = Number(optionsToExercise)|| 0
+  const slabRate = Number(taxSlab)
 
-  const perq = optsEx && ep && fmvEx ? calcPerquisiteTax(fmvEx, ep, optsEx, oInc) : null
-  const capg = optsEx && fmvEx && fmvSale ? calcCapGains(fmvSale, fmvEx, optsEx, hMonths) : null
+  const perqValue   = (optsEx && ep && fmvEx) ? Math.max(0, (fmvEx - ep) * optsEx) : null
+  const perqTax     = perqValue != null ? Math.round(perqValue * slabRate) : null
+  const deferredDate = addFiveYears(exerciseDate)
+
+  const capg = (optsEx && fmvEx && fmvSale) ? calcCapGains(fmvSale, fmvEx, optsEx, hMonths) : null
 
   return (
     <div className="panel tax-panel">
@@ -82,14 +71,33 @@ export default function TaxEstimator({ data }) {
         </div>
 
         <div className="tax-layout">
-          {/* Inputs */}
+          {/* ── Inputs ── */}
           <div className="tax-inputs">
+
+            <div className="tax-input-group">
+              <label className="tax-input-label">DPIIT recognised startup?</label>
+              <div className="dpiit-pill">
+                <button
+                  type="button"
+                  className={`dpiit-btn${!isDpiit ? ' dpiit-btn--active' : ''}`}
+                  onClick={() => setIsDpiit(false)}
+                >No</button>
+                <button
+                  type="button"
+                  className={`dpiit-btn${isDpiit ? ' dpiit-btn--active' : ''}`}
+                  onClick={() => setIsDpiit(true)}
+                >Yes</button>
+              </div>
+            </div>
+
             <div className="tax-input-group">
               <label className="tax-input-label">Options to exercise</label>
               <div className="tax-input-wrap">
-                <input className="tax-input" type="number" value={optionsToExercise} onChange={e => setOptionsToExercise(e.target.value)} />
+                <input className="tax-input" type="number" value={optionsToExercise}
+                  onChange={e => setOptionsToExercise(e.target.value)} />
               </div>
             </div>
+
             <div className="tax-input-group">
               <label className="tax-input-label">Exercise price (₹ / option)</label>
               <div className="tax-input-wrap tax-input-wrap--prefix">
@@ -98,68 +106,151 @@ export default function TaxEstimator({ data }) {
               </div>
               <span className="tax-input-note">From grant letter</span>
             </div>
+
             <div className="tax-input-group">
-              <label className="tax-input-label">FMV at exercise date (₹)</label>
+              <label className="tax-input-label">Fair Market Value at Exercise (₹)</label>
               <div className="tax-input-wrap tax-input-wrap--prefix">
                 <span className="tax-input-prefix">₹</span>
-                <input className="tax-input" type="number" value={fmvAtExercise} onChange={e => setFmvAtExercise(e.target.value)} placeholder="e.g. 500" />
+                <input className="tax-input" type="number" value={fmvAtExercise}
+                  onChange={e => setFmvAtExercise(e.target.value)} placeholder="e.g. 500" />
               </div>
             </div>
+
+            <div className="tax-input-group">
+              <label className="tax-input-label">Income tax slab</label>
+              <select className="tax-input tax-select" value={taxSlab}
+                onChange={e => setTaxSlab(e.target.value)}>
+                {SLAB_OPTIONS.map(s => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {isDpiit && (
+              <div className="tax-input-group">
+                <label className="tax-input-label">Exercise date</label>
+                <input className="tax-input" type="date" value={exerciseDate}
+                  onChange={e => setExerciseDate(e.target.value)} />
+                <span className="tax-input-note">Used to compute 5-year deferral deadline</span>
+              </div>
+            )}
+
+            <div className="tax-input-divider" />
+
             <div className="tax-input-group">
               <label className="tax-input-label">FMV at sale date (₹)</label>
               <div className="tax-input-wrap tax-input-wrap--prefix">
                 <span className="tax-input-prefix">₹</span>
-                <input className="tax-input" type="number" value={fmvAtSale} onChange={e => setFmvAtSale(e.target.value)} placeholder="e.g. 800" />
+                <input className="tax-input" type="number" value={fmvAtSale}
+                  onChange={e => setFmvAtSale(e.target.value)} placeholder="e.g. 800" />
               </div>
             </div>
-            <div className="tax-input-group">
-              <label className="tax-input-label">Other annual income (₹)</label>
-              <div className="tax-input-wrap tax-input-wrap--prefix">
-                <span className="tax-input-prefix">₹</span>
-                <input className="tax-input" type="number" value={otherIncome} onChange={e => setOtherIncome(e.target.value)} />
-              </div>
-            </div>
+
             <div className="tax-input-group">
               <label className="tax-input-label">Holding period after exercise</label>
               <div className="tax-input-wrap tax-input-wrap--suffix">
-                <input className="tax-input" type="number" value={holdingMonths} onChange={e => setHoldingMonths(e.target.value)} />
+                <input className="tax-input" type="number" value={holdingMonths}
+                  onChange={e => setHoldingMonths(e.target.value)} />
                 <span className="tax-input-suffix">months</span>
               </div>
             </div>
           </div>
 
-          {/* Results */}
+          {/* ── Results ── */}
           <div className="tax-results">
-            {/* Perquisite tax */}
+
+            {/* Perquisite Tax — DPIIT-aware */}
             <div className="tax-result-block">
               <div className="tax-result-title">
                 On Exercise — Perquisite Tax
-                <span className="tax-result-tag">Income Tax Act, Sec 17(2)</span>
+                <span className="tax-result-tag">
+                  Sec 17(2){isDpiit ? ' · Sec 192(1C)' : ''}
+                </span>
               </div>
-              {perq ? (
+
+              {perqValue != null ? (
                 <>
-                  <div className="tax-result-row">
-                    <span>Perquisite value</span>
-                    <span className="mono">{fmt(perq.perquisite)}</span>
-                  </div>
-                  <div className="tax-result-row">
-                    <span>Effective tax rate</span>
-                    <span className="mono">{fmtPct(perq.effectiveRate)}</span>
-                  </div>
-                  <div className="tax-result-row tax-result-row--total">
-                    <span>Tax payable at exercise</span>
-                    <span className="mono">{fmt(perq.taxOnPerquisite)}</span>
-                  </div>
-                  <div className="tax-result-note">
-                    Added to salary income; TDS deducted by employer on exercise date
-                  </div>
+                  {isDpiit ? (
+                    <div className="dpiit-cards">
+                      {/* Non-DPIIT card */}
+                      <div className="dpiit-card">
+                        <div className="dpiit-card-header">Without DPIIT</div>
+                        <div className="tax-result-row">
+                          <span>Perquisite value</span>
+                          <span className="mono">{fmt(perqValue)}</span>
+                        </div>
+                        <div className="tax-result-row">
+                          <span>Slab rate</span>
+                          <span className="mono">{fmtPct(slabRate)}</span>
+                        </div>
+                        <div className="tax-result-row tax-result-row--total">
+                          <span>Tax payable</span>
+                          <span className="mono">{fmt(perqTax)}</span>
+                        </div>
+                        <div className="dpiit-timing dpiit-timing--immediate">
+                          Due at exercise — payable this financial year
+                        </div>
+                      </div>
+
+                      {/* DPIIT card */}
+                      <div className="dpiit-card dpiit-card--deferred">
+                        <div className="dpiit-card-header dpiit-card-header--deferred">With DPIIT</div>
+                        <div className="tax-result-row">
+                          <span>Perquisite value</span>
+                          <span className="mono">{fmt(perqValue)}</span>
+                        </div>
+                        <div className="tax-result-row">
+                          <span>Slab rate</span>
+                          <span className="mono">{fmtPct(slabRate)}</span>
+                        </div>
+                        <div className="tax-result-row tax-result-row--total">
+                          <span>Tax amount</span>
+                          <span className="mono">{fmt(perqTax)}</span>
+                        </div>
+                        <div className="dpiit-timing dpiit-timing--deferred">
+                          Tax deferred — due at earliest of: (a) sale of shares, (b) 5 years from exercise, (c) leaving the company
+                        </div>
+                        {deferredDate && (
+                          <div className="dpiit-due-date">
+                            If not sold, latest due by: <strong>{deferredDate}</strong>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="tax-result-row">
+                        <span>Perquisite value</span>
+                        <span className="mono">{fmt(perqValue)}</span>
+                      </div>
+                      <div className="tax-result-row">
+                        <span>Slab rate</span>
+                        <span className="mono">{fmtPct(slabRate)}</span>
+                      </div>
+                      <div className="tax-result-row tax-result-row--total">
+                        <span>Tax payable at exercise</span>
+                        <span className="mono">{fmt(perqTax)}</span>
+                      </div>
+                      <div className="tax-result-note">
+                        Due at exercise — payable this financial year. TDS deducted by employer.
+                      </div>
+                    </>
+                  )}
+
+                  {isDpiit && perqTax != null && (
+                    <div className="dpiit-summary-box">
+                      Under DPIIT recognition, your <strong>{fmt(perqTax)}</strong> perquisite tax
+                      is deferred. You only pay when you sell your shares
+                      {deferredDate ? <>, or by <strong>{deferredDate}</strong>,</> : ','} whichever comes first.
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="tax-result-empty">Fill in FMV at exercise to calculate</div>
               )}
             </div>
 
-            {/* Capital gains */}
+            {/* Capital Gains */}
             <div className="tax-result-block">
               <div className="tax-result-title">
                 On Sale — Capital Gains Tax
@@ -194,22 +285,31 @@ export default function TaxEstimator({ data }) {
                   </div>
                 </>
               ) : (
-                <div className="tax-result-empty">Fill in sale FMV to calculate</div>
+                <div className="tax-result-empty">Fill in sale FMV and holding period to calculate</div>
               )}
             </div>
 
+            {/* Capital Gains note — always visible */}
+            <div className="tax-capgains-note">
+              <Info size={12} style={{ flexShrink: 0, marginTop: 1 }} />
+              <span>
+                When you sell your shares, Capital Gains Tax applies separately on (Sale Price − FMV at Exercise).
+                Holding unlisted shares &gt;24 months qualifies for Long-Term Capital Gains at 20% with indexation.
+              </span>
+            </div>
+
             {/* Total */}
-            {perq && capg && (
+            {perqTax != null && capg && (
               <div className="tax-result-block tax-result-block--total">
                 <div className="tax-result-title">Total Tax Outflow</div>
                 <div className="tax-result-row tax-result-row--grand">
                   <span>Exercise + Sale tax</span>
-                  <span className="mono">{fmt(perq.taxOnPerquisite + capg.tax)}</span>
+                  <span className="mono">{fmt(perqTax + capg.tax)}</span>
                 </div>
                 <div className="tax-result-row">
                   <span>Net gain after all taxes</span>
                   <span className="mono net-gain">
-                    {fmt((fmvSale - ep) * optsEx - perq.taxOnPerquisite - capg.tax)}
+                    {fmt((fmvSale - ep) * optsEx - perqTax - capg.tax)}
                   </span>
                 </div>
               </div>
